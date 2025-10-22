@@ -127,7 +127,8 @@ class SQLAlchemyUserRepository(UserRepository):
         )
         models = result.scalars().all()
         users = [self._to_entity(model) for model in models]
-        print(f"{users=}")
+        users2 = [self._to_entity(model).verification_code_expires_at for model in models]
+        print(f"{users2=}") 
         return users
 
     async def exists_by_email(self, email: str) -> bool:

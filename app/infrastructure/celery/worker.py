@@ -41,12 +41,10 @@ def cleanup_unverified_users():
         async with AsyncSessionLocal() as session:
             user_repo = SQLAlchemyUserRepository(session)
             use_case = CleanupUnverifiedUsersUseCase(user_repo)
-            deleted_count, expired_users = await use_case.execute()
-            return deleted_count, expired_users
+            deleted_count = await use_case.execute()
+            return deleted_count
 
-    # Run the async function using the current event loop
-    # This avoids creating a new loop which conflicts with the one used by the DB driver
     loop = asyncio.get_event_loop()
-    deleted_count, expired_users = loop.run_until_complete(_cleanup())
+    deleted_count = loop.run_until_complete(_cleanup())
 
-    return {"deleted_count": deleted_count, "expired_users": expired_users}
+    return {"deleted_count": deleted_count}

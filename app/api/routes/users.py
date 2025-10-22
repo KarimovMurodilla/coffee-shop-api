@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -48,15 +49,7 @@ async def get_me(
     """
     use_case = GetCurrentUserUseCase(user_repo)
 
-    try:
-    
-        async with AsyncSessionLocal() as session:
-            user_repo = SQLAlchemyUserRepository(session)
-            use_case_clean = CleanupUnverifiedUsersUseCase(user_repo)
-            deleted_count, expired_users = await use_case_clean.execute()
-            print(f"Deleted {deleted_count} unverified users: {expired_users}")
-
-        
+    try: 
         return await use_case.execute(current_user.id)
     except UserNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

@@ -226,4 +226,4 @@ class CleanupUnverifiedUsersUseCase:
                 await self.user_repo.delete(user.id)
                 deleted_count += 1
 
-        return deleted_count, expired_users
+        return deleted_count
