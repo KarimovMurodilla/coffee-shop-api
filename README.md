@@ -433,7 +433,7 @@ Delete user (Admin only).
 
 **1. Register a new user:**
 ```bash
-curl -X POST http://localhost:8000/auth/signup \
+curl -X POST http://localhost:80/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -445,17 +445,50 @@ curl -X POST http://localhost:8000/auth/signup \
 
 **2. Check console for verification code, then verify:**
 ```bash
-curl -X POST http://localhost:8000/auth/verify \
+curl -X POST http://localhost:80/auth/verify \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
     "verification_code": "<code-from-console>"
   }'
 ```
+**Note**: In development mode, verification emails are printed to the console instead of being sent via MailJet. To enable actual email sending, set `ENVIRONMENT=production` and configure valid MailJet credentials.json
+```
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
+}
+```
+
+### POST /auth/verify
+Verify email address.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "verification_code": "abc123xyz..."
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "id": 0,
+  "email": "string",
+  "first_name": "string",
+  "last_name": "string",
+  "role": "user",
+  "is_verified": true,
+  "created_at": "2025-10-23T09:42:03.855Z",
+  "updated_at": "2025-10-23T09:42:03.855Z"
+}
+```
 
 **3. Login:**
 ```bash
-curl -X POST http://localhost:8000/auth/login \
+curl -X POST http://localhost:80/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -465,13 +498,13 @@ curl -X POST http://localhost:8000/auth/login \
 
 **4. Access protected endpoint:**
 ```bash
-curl -X GET http://localhost:8000/users/me \
+curl -X GET http://localhost:80/users/me \
   -H "Authorization: Bearer <access_token>"
 ```
 
 ### Using Swagger UI
 
-Visit http://localhost:8000/docs for interactive API documentation where you can:
+Visit http://localhost:80/docs for interactive API documentation where you can:
 - Test all endpoints
 - Authenticate and store tokens
 - View request/response schemas
@@ -711,39 +744,3 @@ Created as part of technical assessment for ORB IT.
 ## 📧 Support
 
 For questions or issues, please open an issue in the repository.
-
----
-
-**Note**: In development mode, verification emails are printed to the console instead of being sent via MailJet. To enable actual email sending, set `ENVIRONMENT=production` and configure valid MailJet credentials.json
-```
-{
-  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "token_type": "bearer"
-}
-```
-
-### POST /auth/verify
-Verify email address.
-
-**Request Body:**
-```json
-{
-  "email": "user@example.com",
-  "verification_code": "abc123xyz..."
-}
-```
-
-**Response:** `200 OK`
-```json
-{
-  "id": 0,
-  "email": "string",
-  "first_name": "string",
-  "last_name": "string",
-  "role": "user",
-  "is_verified": true,
-  "created_at": "2025-10-23T09:42:03.855Z",
-  "updated_at": "2025-10-23T09:42:03.855Z"
-}
-```
