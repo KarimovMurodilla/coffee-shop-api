@@ -181,6 +181,9 @@ docker-compose exec api python
 
 # Open PostgreSQL shell
 docker-compose exec db psql -U postgres -d coffee_shop
+
+# Run tests
+docker compose exec api pytest
 ```
 
 ## Using Makefile (Even Easier!)
@@ -188,6 +191,8 @@ docker-compose exec db psql -U postgres -d coffee_shop
 If you have `make` installed:
 
 ```bash
+# Common Commands
+
 make help          # Show all available commands
 make up            # Start services
 make down          # Stop services
@@ -196,6 +201,7 @@ make logs-api      # View API logs
 make migrate       # Run migrations
 make shell         # Open Python shell
 make clean         # Remove everything
+make test          # Run all tests
 ```
 
 
