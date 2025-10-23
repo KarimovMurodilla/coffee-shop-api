@@ -1,7 +1,8 @@
 from app.core.config import settings
 from app.domain.services import EmailService
-
-from app.infrastructure.celery.email_tasks import send_verification_email as send_verification_email_task
+from app.infrastructure.celery.email_tasks import (
+    send_verification_email as send_verification_email_task,
+)
 
 
 class MailJetEmailService(EmailService):

@@ -12,6 +12,9 @@ build: ## Build Docker images
 up: ## Start all services
 	docker compose up -d
 
+up-build: ## Build and start all services
+	docker compose up -d --build
+
 down: ## Stop all services
 	docker compose down
 
@@ -24,7 +27,7 @@ logs-api: ## View logs from API service only
 migrate: ## Run database migrations
 	docker compose exec api alembic upgrade head
 
-migrate-create: ## Create new migration (usage: make migrate-create msg="your message")
+generate: ## Create new migration (usage: make generate msg="your message")
 	docker compose exec api alembic revision --autogenerate -m "$(msg)"
 
 migrate-rollback: ## Rollback last migration
@@ -42,19 +45,38 @@ redis-cli: ## Open Redis CLI
 celery-logs: ## View Celery worker logs
 	docker compose logs -f celery_worker
 
-test: ## Run tests (to be implemented)
-	docker compose exec api pytest
-
-clean: ## Remove all containers and volumes
-	docker compose down -v
-	docker system prune -f
-
 restart: ## Restart all services
 	docker compose restart
 
 restart-api: ## Restart API service only
 	docker compose restart api
 
+test: ## Run all tests
+	docker compose exec api pytest
 
-create-admin: ## Create an admin user (usage: make create-admin email=your_email password=your_password)
-	docker compose exec api python scripts/create_admin.py
+test-unit: ## Run unit tests only
+	docker compose exec api pytest tests/unit/
+
+test-integration: ## Run integration tests only
+	docker compose exec api pytest tests/integration/
+
+test-e2e: ## Run end-to-end tests only
+	docker compose exec api pytest tests/e2e/
+
+test-cov: ## Run tests with coverage report
+	docker compose exec api pytest --cov=app --cov-report=html --cov-report=term
+
+test-cov-html: ## Run tests with HTML coverage report and open it
+	docker compose exec api pytest --cov=app --cov-report=html
+	@echo "Opening coverage report..."
+	@open htmlcov/index.html || xdg-open htmlcov/index.html || start htmlcov/index.html
+
+test-verbose: ## Run tests with verbose output
+	docker compose exec api pytest -vv
+
+test-failed: ## Run only failed tests from last run
+	docker compose exec api pytest --lf
+
+
+ruff: ## Run ruff linter
+	docker compose exec api ruff check .

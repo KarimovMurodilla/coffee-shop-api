@@ -4,10 +4,9 @@ from celery import Celery
 from celery.schedules import crontab
 
 from app.application.use_cases.user import CleanupUnverifiedUsersUseCase
+from app.core.config import settings
 from app.infrastructure.database.connection import AsyncSessionLocal
 from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
-
-from app.core.config import settings
 
 celery_app = Celery(
     "coffee_shop", broker=settings.redis_url, backend=settings.redis_url

@@ -121,14 +121,16 @@ class SQLAlchemyUserRepository(UserRepository):
         """Get all unverified users whose verification has expired."""
         result = await self.session.execute(
             select(UserModel).where(
-                UserModel.is_verified == False,
+                UserModel.is_verified == False,  # noqa: E712
                 UserModel.verification_code_expires_at < datetime.utcnow(),
             )
         )
         models = result.scalars().all()
         users = [self._to_entity(model) for model in models]
-        users2 = [self._to_entity(model).verification_code_expires_at for model in models]
-        print(f"{users2=}") 
+        users2 = [
+            self._to_entity(model).verification_code_expires_at for model in models
+        ]
+        print(f"{users2=}")
         return users
 
     async def exists_by_email(self, email: str) -> bool:

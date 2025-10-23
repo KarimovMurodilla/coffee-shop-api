@@ -5,8 +5,6 @@ services:
     image: postgres:15-alpine
     env_file:
       - .env
-    # ports: # <- ПОРТ УДАЛЕН. База данных недоступна снаружи
-    #   - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -14,25 +12,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: # <- Сервис добавлен в нашу сеть
+    networks:
       - coffeeshop-net
 
   redis:
     image: redis:7-alpine
-    # ports: # <- ПОРТ УДАЛЕН. Redis недоступен снаружи
-    #   - "6379:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-    networks: # <- Сервис добавлен в нашу сеть
+    networks:
       - coffeeshop-net
 
   api:
     build: .
-    # ports: # <- ПОРТ УДАЛЕН. API будет доступен только через Nginx
-    #   - "8000:8000"
     env_file:
       - .env
     depends_on:
@@ -42,50 +36,46 @@ services:
         condition: service_healthy
     volumes:
       - .:/app
-    networks: # <- Сервис добавлен в нашу сеть
+    networks:
       - coffeeshop-net
 
-  # --- НОВЫЙ СЕРВИС NGINX ---
   nginx:
     image: nginx:1.25-alpine
     ports:
-      # Публикуем порт 80 наружу, который будет проксировать запросы на порт 8000 сервиса api
       - "80:80"
     volumes:
-      # Подключаем наш конфигурационный файл
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - api
-    networks: # <- Сервис добавлен в нашу сеть
+    networks:
       - coffeeshop-net
 
   celery_worker:
     build: .
     env_file:
-      - .env # <- Лучше использовать env_file для консистентности
+      - .env
     depends_on:
       - redis
       - db
     volumes:
       - .:/app
     command: celery -A app.infrastructure.celery.worker worker --loglevel=info
-    networks: # <- Сервис добавлен в нашу сеть
+    networks:
       - coffeeshop-net
 
   celery_beat:
     build: .
     env_file:
-      - .env # <- Лучше использовать env_file
+      - .env
     depends_on:
       - redis
       - db
     volumes:
       - .:/app
     command: celery -A app.infrastructure.celery.worker beat --loglevel=info
-    networks: # <- Сервис добавлен в нашу сеть
+    networks:
       - coffeeshop-net
 
-# --- ОПРЕДЕЛЯЕМ НАШУ ИЗОЛИРОВАННУЮ СЕТЬ ---
 networks:
   coffeeshop-net:
     driver: bridge

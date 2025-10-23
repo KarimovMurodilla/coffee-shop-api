@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -18,14 +17,6 @@ from app.application.use_cases.user import (
     UpdateUserUseCase,
 )
 from app.domain.entities import User
-
-
-import asyncio
-
-from app.application.use_cases.user import CleanupUnverifiedUsersUseCase
-from app.infrastructure.database.connection import AsyncSessionLocal
-from app.infrastructure.repositories.user_repository import SQLAlchemyUserRepository
-
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -49,7 +40,7 @@ async def get_me(
     """
     use_case = GetCurrentUserUseCase(user_repo)
 
-    try: 
+    try:
         return await use_case.execute(current_user.id)
     except UserNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))

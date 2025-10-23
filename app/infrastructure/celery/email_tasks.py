@@ -1,5 +1,6 @@
-from mailjet_rest import Client
 import traceback
+
+from mailjet_rest import Client
 
 from app.core.config import settings
 from app.infrastructure.celery.worker import celery_app
@@ -31,7 +32,10 @@ def send_verification_email(to_email: str, verification_code: str) -> dict:
         data = {
             "Messages": [
                 {
-                    "From": {"Email": settings.mailjet_from_email, "Name": settings.mailjet_from_name},
+                    "From": {
+                        "Email": settings.mailjet_from_email,
+                        "Name": settings.mailjet_from_name,
+                    },
                     "To": [{"Email": to_email, "Name": to_email.split("@")[0]}],
                     "Subject": "Verify your Coffee Shop account",
                     "TextPart": f"Your verification code is: {verification_code}",
@@ -44,8 +48,11 @@ def send_verification_email(to_email: str, verification_code: str) -> dict:
                                 Please use the verification code below
                                 to verify your email address:
                             </p>
-                            <div style="background-color: #f4f4f4; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                                <h1 style="color: #333; margin: 0; letter-spacing: 5px;">
+                            <div style="background-color: #f4f4f4; padding: 15px;
+                                margin: 20px 0;
+                                border-radius: 5px;">
+                                <h1 style="color: #333; margin: 0;
+                                letter-spacing: 5px;">
                                     {verification_code}
                                 </h1>
                             </div>
