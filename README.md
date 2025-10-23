@@ -10,80 +10,63 @@ This project follows **Clean Architecture** principles, separating concerns into
 coffee-shop-api/
 │
 ├── app/                                    # Main application package
-│   ├── __init__.py
 │   │
 │   ├── domain/                            # Domain Layer (Clean Architecture)
-│   │   ├── __init__.py
 │   │   ├── entities.py                    # User entity, UserRole enum
 │   │   ├── repositories.py                # UserRepository interface
 │   │   └── services.py                    # EmailService, PasswordService, TokenService interfaces
 │   │
 │   ├── application/                       # Application Layer (Use Cases)
-│   │   ├── __init__.py
 │   │   ├── dto.py                         # Request/Response DTOs
 │   │   ├── exceptions.py                  # Application exceptions
 │   │   └── use_cases/
-│   │       ├── __init__.py
 │   │       ├── auth.py                    # SignupUseCase, LoginUseCase, RefreshTokenUseCase, VerifyEmailUseCase
 │   │       └── user.py                    # GetCurrentUserUseCase, GetAllUsersUseCase, GetUserByIdUseCase, 
 │   │                                      # UpdateUserUseCase, DeleteUserUseCase, CleanupUnverifiedUsersUseCase
 │   │
 │   ├── infrastructure/                    # Infrastructure Layer (Implementations)
-│   │   ├── __init__.py
 │   │   │
 │   │   ├── database/
-│   │   │   ├── __init__.py
 │   │   │   ├── models.py                  # SQLAlchemy UserModel
 │   │   │   └── connection.py              # Database engine and session factory
 │   │   │
 │   │   ├── repositories/
-│   │   │   ├── __init__.py
 │   │   │   └── user_repository.py         # SQLAlchemyUserRepository implementation
 │   │   │
 │   │   ├── services/
-│   │   │   ├── __init__.py
 │   │   │   ├── email_service.py           # MailJetEmailService implementation
 │   │   │   ├── password_service.py        # BcryptPasswordService implementation
 │   │   │   └── token_service.py           # JWTTokenService implementation
 │   │   │
 │   │   └── celery/
-│   │       ├── __init__.py
 │   │       └── worker.py                  # Celery app and cleanup_unverified_users task
 │   │
 │   ├── api/                               # API Layer (Interface Adapters)
-│   │   ├── __init__.py
 │   │   ├── dependencies.py                # FastAPI dependency injection functions
 │   │   └── routes/
-│   │       ├── __init__.py
 │   │       ├── auth.py                    # POST /auth/signup, /auth/login, /auth/refresh, /auth/verify
 │   │       └── users.py                   # GET /users/me, /users, /users/{id}
 │   │                                      # PATCH /users/{id}, DELETE /users/{id}
 │   │
 │   ├── core/                              # Core Configuration
-│   │   ├── __init__.py
 │   │   └── config.py                      # Settings class with Pydantic
 │   │
 │   └── main.py                            # FastAPI application entry point
 │
 ├── alembic/                               # Database Migrations
 │   ├── versions/
-│   │   ├── __init__.py
 │   │   └── 001_initial_migration.py       # Initial users table migration
 │   ├── env.py                             # Alembic environment configuration
 │   └── script.py.mako                     # Migration template
 │
 ├── tests/                                 # Test Suite (to be implemented)
-│   ├── __init__.py
 │   ├── unit/                              # Unit tests
-│   │   ├── __init__.py
 │   │   ├── test_entities.py
 │   │   └── test_use_cases.py
 │   ├── integration/                       # Integration tests
-│   │   ├── __init__.py
 │   │   ├── test_repositories.py
 │   │   └── test_services.py
 │   └── e2e/                               # End-to-end tests
-│       ├── __init__.py
 │       └── test_api.py
 │
 ├── .env.example                           # Example environment variables
