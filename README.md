@@ -579,7 +579,7 @@ coffee-shop-api/
 
 - **Framework**: FastAPI 0.109.0
 - **ORM**: SQLAlchemy 2.0.25 (async)
-- **Database**: PostgreSQL 15 (SQLite for development)
+- **Database**: PostgreSQL 15 (SQLite for testing)
 - **Authentication**: JWT (python-jose)
 - **Password Hashing**: bcrypt (passlib)
 - **Email Service**: MailJet API
