@@ -48,3 +48,9 @@ def cleanup_unverified_users():
     deleted_count = loop.run_until_complete(_cleanup())
 
     return {"deleted_count": deleted_count}
+
+
+try:
+    import app.infrastructure.celery.email_tasks  # noqa: F401
+except Exception:
+    pass

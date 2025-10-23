@@ -7,42 +7,95 @@ A production-ready user management system built with FastAPI, implementing Clean
 This project follows **Clean Architecture** principles, separating concerns into distinct layers:
 
 ```
-app/
-├── domain/                 # Enterprise Business Rules
-│   ├── entities.py        # Domain entities (User, UserRole)
-│   ├── repositories.py    # Repository interfaces
-│   └── services.py        # Domain service interfaces
+coffee-shop-api/
 │
-├── application/           # Application Business Rules
-│   ├── dto.py            # Data Transfer Objects
-│   ├── exceptions.py     # Application exceptions
-│   └── use_cases/        # Use case implementations
-│       ├── auth.py       # Authentication use cases
-│       └── user.py       # User management use cases
+├── app/                                    # Main application package
+│   ├── __init__.py
+│   │
+│   ├── domain/                            # Domain Layer (Clean Architecture)
+│   │   ├── __init__.py
+│   │   ├── entities.py                    # User entity, UserRole enum
+│   │   ├── repositories.py                # UserRepository interface
+│   │   └── services.py                    # EmailService, PasswordService, TokenService interfaces
+│   │
+│   ├── application/                       # Application Layer (Use Cases)
+│   │   ├── __init__.py
+│   │   ├── dto.py                         # Request/Response DTOs
+│   │   ├── exceptions.py                  # Application exceptions
+│   │   └── use_cases/
+│   │       ├── __init__.py
+│   │       ├── auth.py                    # SignupUseCase, LoginUseCase, RefreshTokenUseCase, VerifyEmailUseCase
+│   │       └── user.py                    # GetCurrentUserUseCase, GetAllUsersUseCase, GetUserByIdUseCase, 
+│   │                                      # UpdateUserUseCase, DeleteUserUseCase, CleanupUnverifiedUsersUseCase
+│   │
+│   ├── infrastructure/                    # Infrastructure Layer (Implementations)
+│   │   ├── __init__.py
+│   │   │
+│   │   ├── database/
+│   │   │   ├── __init__.py
+│   │   │   ├── models.py                  # SQLAlchemy UserModel
+│   │   │   └── connection.py              # Database engine and session factory
+│   │   │
+│   │   ├── repositories/
+│   │   │   ├── __init__.py
+│   │   │   └── user_repository.py         # SQLAlchemyUserRepository implementation
+│   │   │
+│   │   ├── services/
+│   │   │   ├── __init__.py
+│   │   │   ├── email_service.py           # MailJetEmailService implementation
+│   │   │   ├── password_service.py        # BcryptPasswordService implementation
+│   │   │   └── token_service.py           # JWTTokenService implementation
+│   │   │
+│   │   └── celery/
+│   │       ├── __init__.py
+│   │       └── worker.py                  # Celery app and cleanup_unverified_users task
+│   │
+│   ├── api/                               # API Layer (Interface Adapters)
+│   │   ├── __init__.py
+│   │   ├── dependencies.py                # FastAPI dependency injection functions
+│   │   └── routes/
+│   │       ├── __init__.py
+│   │       ├── auth.py                    # POST /auth/signup, /auth/login, /auth/refresh, /auth/verify
+│   │       └── users.py                   # GET /users/me, /users, /users/{id}
+│   │                                      # PATCH /users/{id}, DELETE /users/{id}
+│   │
+│   ├── core/                              # Core Configuration
+│   │   ├── __init__.py
+│   │   └── config.py                      # Settings class with Pydantic
+│   │
+│   └── main.py                            # FastAPI application entry point
 │
-├── infrastructure/        # Frameworks & Drivers
-│   ├── database/         # Database implementations
-│   │   ├── models.py     # SQLAlchemy models
-│   │   └── connection.py # Database connection
-│   ├── repositories/     # Repository implementations
-│   │   └── user_repository.py
-│   ├── services/         # Service implementations
-│   │   ├── email_service.py     # MailJet integration
-│   │   ├── password_service.py  # Password hashing
-│   │   └── token_service.py     # JWT tokens
-│   └── celery/          # Background tasks
-│       └── worker.py    # Celery worker & tasks
+├── alembic/                               # Database Migrations
+│   ├── versions/
+│   │   ├── __init__.py
+│   │   └── 001_initial_migration.py       # Initial users table migration
+│   ├── env.py                             # Alembic environment configuration
+│   └── script.py.mako                     # Migration template
 │
-├── api/                  # Interface Adapters
-│   ├── routes/          # API endpoints
-│   │   ├── auth.py      # Authentication endpoints
-│   │   └── users.py     # User management endpoints
-│   └── dependencies.py  # FastAPI dependencies
+├── tests/                                 # Test Suite (to be implemented)
+│   ├── __init__.py
+│   ├── unit/                              # Unit tests
+│   │   ├── __init__.py
+│   │   ├── test_entities.py
+│   │   └── test_use_cases.py
+│   ├── integration/                       # Integration tests
+│   │   ├── __init__.py
+│   │   ├── test_repositories.py
+│   │   └── test_services.py
+│   └── e2e/                               # End-to-end tests
+│       ├── __init__.py
+│       └── test_api.py
 │
-├── core/                # Configuration
-│   └── config.py       # Application settings
-│
-└── main.py             # Application entry point
+├── .env.example                           # Example environment variables
+├── .env                                   # Environment variables (not in git)
+├── .gitignore                             # Git ignore rules
+├── alembic.ini                            # Alembic configuration
+├── docker-compose.yml                     # Docker Compose configuration
+├── Dockerfile                             # Docker image definition
+├── Makefile                               # Convenience commands
+├── requirements.txt                       # Python dependencies
+├── README.md                              # Project documentation
+└── PROJECT_STRUCTURE.md                   # This file
 ```
 
 ### Architecture Layers
@@ -170,6 +223,33 @@ celery -A app.infrastructure.celery.worker worker --loglevel=info
 ```bash
 celery -A app.infrastructure.celery.worker beat --loglevel=info
 ```
+
+### Email sending (async)
+
+This project uses Celery to send verification emails asynchronously. The `MailJetEmailService`
+dispatches a Celery task instead of sending email synchronously so that HTTP responses stay fast.
+
+How it works:
+- In development mode (`ENVIRONMENT=development`) emails are printed to the console.
+- In production, the `app.infrastructure.celery.email_tasks.send_verification_email` task
+  sends the email via MailJet.
+
+To process queued email tasks make sure Redis (or your configured broker) is running and then start a worker:
+
+```bash
+celery -A app.infrastructure.celery.worker worker --loglevel=info
+```
+
+If you want periodic jobs (like cleanup) enabled, also start beat in a separate terminal:
+
+```bash
+celery -A app.infrastructure.celery.worker beat --loglevel=info
+```
+
+Notes & next steps:
+- Consider adding retries, timeouts and monitoring for the email task.
+- For high volume, consider dedicated worker queues and rate limits for the MailJet API.
+
 
 ## 📖 API Documentation
 
