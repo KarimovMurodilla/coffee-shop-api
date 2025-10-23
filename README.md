@@ -147,6 +147,11 @@ ENVIRONMENT=development
 docker-compose up -d
 ```
 
+5. **Run database migrations**
+```bash
+docker-compose exec api alembic upgrade head
+```
+
 The API will be available at:
 - **API**: http://localhost:80
 - **Swagger Docs**: http://localhost:80/docs
@@ -199,6 +204,7 @@ make down          # Stop services
 make logs          # View logs
 make logs-api      # View API logs
 make migrate       # Run migrations
+make generate      # Generate new migration
 make shell         # Open Python shell
 make clean         # Remove everything
 make test          # Run all tests
