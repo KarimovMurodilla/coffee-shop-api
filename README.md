@@ -152,6 +152,53 @@ The API will be available at:
 - **Swagger Docs**: http://localhost:80/docs
 - **ReDoc**: http://localhost:80/redoc
 
+## Common Commands
+
+```bash
+# View logs
+docker-compose logs -f
+
+# View API logs only
+docker-compose logs -f api
+
+# View Celery worker logs
+docker-compose logs -f celery_worker
+
+# Restart API service
+docker-compose restart api
+
+# Stop all services
+docker-compose down
+
+# Stop and remove all data
+docker-compose down -v
+
+# Run database migrations
+docker-compose exec api alembic upgrade head
+
+# Open Python shell
+docker-compose exec api python
+
+# Open PostgreSQL shell
+docker-compose exec db psql -U postgres -d coffee_shop
+```
+
+## Using Makefile (Even Easier!)
+
+If you have `make` installed:
+
+```bash
+make help          # Show all available commands
+make up            # Start services
+make down          # Stop services
+make logs          # View logs
+make logs-api      # View API logs
+make migrate       # Run migrations
+make shell         # Open Python shell
+make clean         # Remove everything
+```
+
+
 ### Local Development (without Docker)
 
 1. **Create virtual environment**
