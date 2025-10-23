@@ -126,7 +126,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_PORT=5432
 POSTGRES_HOST=db
 
-REDIS_URL=redis://localhost:6379/0
+REDIS_URL=redis://redis:6379/0
 
 SECRET_KEY=your-super-secret-key-change-in-production
 ALGORITHM=HS256
