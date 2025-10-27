@@ -229,7 +229,7 @@ RUNNING THE PROJECT
 2. Copy .env.example to .env
 3. Configure environment variables
 4. Run: docker-compose up -d
-5. Access: http://localhost:8000/docs
+5. Access: http://localhost:80/docs
 6. Create admin: docker-compose exec api python scripts/create_admin.py
 7. Run tests: make test
 
