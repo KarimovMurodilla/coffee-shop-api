@@ -48,7 +48,7 @@ docker-compose ps
 Expected output:
 ```
 NAME                     STATUS              PORTS
-coffee-shop-api          running             0.0.0.0:80->80/tcp
+coffee-shop-api          running             0.0.0.0:8000->8000/tcp
 coffee-shop-db           running             0.0.0.0:5432->5432/tcp
 coffee-shop-redis        running             0.0.0.0:6379->6379/tcp
 coffee-shop-celery       running
@@ -59,7 +59,7 @@ coffee-shop-celery-beat  running
 
 ```bash
 # Check API health
-curl http://localhost:80/health
+curl http://localhost:8000/health
 
 # Expected response:
 # {"status":"healthy","service":"coffee-shop-api","version":"1.0.0"}
@@ -68,8 +68,8 @@ curl http://localhost:80/health
 ## Step 5: Access API Documentation
 
 Open in your browser:
-- **Swagger UI**: http://localhost:80/docs
-- **ReDoc**: http://localhost:80/redoc
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
 ## Step 6: Create First Admin User
 
@@ -91,7 +91,7 @@ Enter last name (optional): User
 ### 1. Register a Regular User
 
 ```bash
-curl -X POST http://localhost:80/auth/signup \
+curl -X POST http://localhost:8000/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -116,7 +116,7 @@ VERIFICATION CODE: abc123xyz789...
 ### 3. Verify Email
 
 ```bash
-curl -X POST http://localhost:80/auth/verify \
+curl -X POST http://localhost:8000/auth/verify \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -127,7 +127,7 @@ curl -X POST http://localhost:80/auth/verify \
 ### 4. Login
 
 ```bash
-curl -X POST http://localhost:80/auth/login \
+curl -X POST http://localhost:8000/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -140,13 +140,13 @@ Save the `access_token` from the response.
 ### 5. Access Protected Endpoint
 
 ```bash
-curl -X GET http://localhost:80/users/me \
+curl -X GET http://localhost:8000/users/me \
   -H "Authorization: Bearer <your-access-token>"
 ```
 
 ## Using Swagger UI (Easier!)
 
-1. Go to http://localhost:80/docs
+1. Go to http://localhost:8000/docs
 2. Click on **POST /auth/signup**
 3. Click **"Try it out"**
 4. Fill in the request body
@@ -210,7 +210,7 @@ make clean         # Remove everything
 
 ```bash
 # 1. Signup
-SIGNUP_RESPONSE=$(curl -s -X POST http://localhost:80/auth/signup \
+SIGNUP_RESPONSE=$(curl -s -X POST http://localhost:8000/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"Test123!"}')
 
@@ -220,12 +220,12 @@ echo $SIGNUP_RESPONSE
 docker-compose logs api | grep "VERIFICATION CODE" | tail -1
 
 # 3. Verify (replace with actual code)
-curl -X POST http://localhost:80/auth/verify \
+curl -X POST http://localhost:8000/auth/verify \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","verification_code":"<code-here>"}'
 
 # 4. Login
-LOGIN_RESPONSE=$(curl -s -X POST http://localhost:80/auth/login \
+LOGIN_RESPONSE=$(curl -s -X POST http://localhost:8000/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"Test123!"}')
 
@@ -233,7 +233,7 @@ LOGIN_RESPONSE=$(curl -s -X POST http://localhost:80/auth/login \
 ACCESS_TOKEN=$(echo $LOGIN_RESPONSE | jq -r '.access_token')
 
 # 6. Access protected endpoint
-curl -X GET http://localhost:80/users/me \
+curl -X GET http://localhost:8000/users/me \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
@@ -241,28 +241,28 @@ curl -X GET http://localhost:80/users/me \
 
 ```bash
 # Login as admin
-ADMIN_LOGIN=$(curl -s -X POST http://localhost:80/auth/login \
+ADMIN_LOGIN=$(curl -s -X POST http://localhost:8000/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@coffeeshop.com","password":"AdminPass123!"}')
 
 ADMIN_TOKEN=$(echo $ADMIN_LOGIN | jq -r '.access_token')
 
 # Get all users
-curl -X GET http://localhost:80/users \
+curl -X GET http://localhost:8000/users \
   -H "Authorization: Bearer $ADMIN_TOKEN"
 
 # Get specific user
-curl -X GET http://localhost:80/users/1 \
+curl -X GET http://localhost:8000/users/1 \
   -H "Authorization: Bearer $ADMIN_TOKEN"
 
 # Update user
-curl -X PATCH http://localhost:80/users/1 \
+curl -X PATCH http://localhost:8000/users/1 \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"first_name":"Updated","last_name":"Name"}'
 
 # Delete user
-curl -X DELETE http://localhost:80/users/2 \
+curl -X DELETE http://localhost:8000/users/2 \
   -H "Authorization: Bearer $ADMIN_TOKEN"
 ```
 
@@ -272,7 +272,7 @@ curl -X DELETE http://localhost:80/users/2 \
 
 ```bash
 # Check if ports are available
-lsof -i :80  # API port
+lsof -i :8000  # API port
 lsof -i :5432  # PostgreSQL port
 lsof -i :6379  # Redis port
 
@@ -362,7 +362,7 @@ Use Redis Desktop Manager or similar:
 
 Use Postman, Insomnia, or HTTPie for advanced API testing.
 
-Import the OpenAPI schema from: http://localhost:80/openapi.json
+Import the OpenAPI schema from: http://localhost:8000/openapi.json
 
 ## Next Steps
 
@@ -378,9 +378,9 @@ Import the OpenAPI schema from: http://localhost:80/openapi.json
 
 | Service | URL | Credentials |
 |---------|-----|-------------|
-| API | http://localhost:80 | - |
-| Swagger Docs | http://localhost:80/docs | - |
-| ReDoc | http://localhost:80/redoc | - |
+| API | http://localhost:8000 | - |
+| Swagger Docs | http://localhost:8000/docs | - |
+| ReDoc | http://localhost:8000/redoc | - |
 | PostgreSQL | localhost:5432 | postgres/postgres |
 | Redis | localhost:6379 | - |
 

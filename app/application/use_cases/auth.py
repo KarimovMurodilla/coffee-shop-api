@@ -81,6 +81,7 @@ class SignupUseCase:
 
         # Send verification email (async, don't wait for result)
         # In production, this should be handled by a background task
+        # UPD: Used celery to send emails in background
         try:
             await self.email_service.send_verification_email(
                 created_user.email, verification_code
